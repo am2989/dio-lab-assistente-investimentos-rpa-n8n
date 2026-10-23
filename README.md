@@ -1,172 +1,73 @@
-# Criando um Assistente de Investimentos com RPA e IA Generativa
+# Assistente de Investimentos com n8n
 
-## Descrição
+## Sobre o projeto
 
-Aprenda na prática como criar um fluxo de automação inteligente combinando técnicas de RPA (Robotic Process Automation) com workflows de IA no N8N.
+Workflow educativo criado no n8n para automatizar o tratamento de dados de clientes e preparar mensagens de e-mail com apoio de inteligência artificial.
 
-Neste desafio, você vai construir um assistente de investimentos automatizado. O fluxo começa com a extração de dados de clientes em uma página web usando Python, passa pela orquestração de um workflow no N8N e termina com a geração de mensagens personalizadas para cada perfil de investidor.
+O fluxo recebe clientes por Webhook, consulta um CSV de investimentos, processa os dados em JavaScript, seleciona uma opção de acordo com o perfil e saldo informado, pede à IA que prepare o texto do e-mail e valida o endereço antes do envio pelo Gmail.
 
-O projeto foi pensado para ser simples e acessível, mesmo para quem está dando os primeiros passos em Python e automação. A ideia é que você entenda o conceito de RPA de forma leve e aplique tudo em um cenário realista do mercado financeiro.
+## Nós do workflow
 
-## Objetivo do Projeto
+1. **Webhook** — recebe um pedido `POST` no caminho `Clientes`.
+2. **HTTP Request** — consulta o CSV de investimentos disponibilizado no material do desafio.
+3. **Code in JavaScript** — interpreta os dados CSV, incluindo campos entre aspas, e normaliza os valores mínimos.
+4. **Merge** — combina os dados do Webhook e os investimentos.
+5. **Code in JavaScript1** — compara perfil e saldo e prepara os resultados por cliente.
+6. **Code in JavaScript2** — prepara os campos de todos os clientes, incluindo dados incompletos, para que possam ser tratados sem desaparecer silenciosamente do fluxo.
+7. **Message a model** — gera um rascunho de e-mail sem promessas de ganhos ou garantias.
+8. **Code in JavaScript3** — interpreta a resposta da IA e prepara o conteúdo do e-mail.
+9. **If** — valida o formato do endereço de e-mail e confirma que existe uma recomendação antes de permitir o envio.
+10. **Send a message** — envia o e-mail pelo Gmail quando o endereço passa na validação.
+11. **Respond to Webhook** — devolve uma resposta genérica de conclusão pelo caminho de envio ou pelo caminho de endereço inválido.
 
-Desenvolver um pipeline de automação que:
+## Como importar
 
-1. **Coleta dados de clientes** de uma página web simulada usando Python
-2. **Processa as informações** através de um workflow no N8N
-3. **Cruza perfis de investidor** com uma base de opções de investimento
-4. **Gera mensagens personalizadas** para cada cliente
+1. Descarrega `assistente-investimentos-corrigido.json`.
+2. Abre o n8n e importa o workflow a partir do ficheiro.
+3. Configura as credenciais do modelo de IA e do Gmail na tua instância.
+4. Confirma a URL do CSV e o formato do corpo do Webhook.
+5. Testa primeiro com dados fictícios e com um endereço de e-mail que controles.
 
-Ao final, você terá um sistema funcional que demonstra como empresas do setor financeiro podem automatizar a comunicação com clientes de forma inteligente.
+## Exemplo de dados de entrada
 
-## Arquitetura do Projeto
+O código espera um objeto com uma lista `clientes`, por exemplo:
 
-```mermaid
-flowchart LR
-  %% Pipeline RPA + N8N + IA (máx. 7 caixinhas)
-
-  subgraph GH["GitHub Pages"]
-    A["Clientes<br>(docs/index.html)"]
-    E["Investimentos (docs/data.csv)"]
-  end
-
-  subgraph PY["RPA (Python)"]
-    B["Extrair Clientes"]
-  end
-
-  subgraph N8["N8N (Workflow)"]
-    C["Webhook<br>(Entrada)"]
-    D["Cruzar Dados<br>(Clientes x Investimentos)"]
-    M["Gerar Mensagem<br>(Template/LLM)"]
-    C --> D --> M
-  end
-
-  subgraph OUT["Saída"]
-    O["Mensagens Personalizadas"]
-  end
-
-  A <-->|HTTP| B --> C
-  E <-->|HTTP| D
-  M --> O
-
-  %% Estilos
-  classDef source fill:#E3F2FD,stroke:#1E88E5,stroke-width:1px,color:#0D47A1;
-  classDef rpa fill:#E8F5E9,stroke:#43A047,stroke-width:1px,color:#1B5E20;
-  classDef n8n fill:#FFF3E0,stroke:#FB8C00,stroke-width:1px,color:#E65100;
-  classDef out fill:#FCE4EC,stroke:#D81B60,stroke-width:1px,color:#880E4F;
-
-  class A,E source;
-  class B rpa;
-  class C,D,M n8n;
-  class O out;
-
+```json
+{
+  "clientes": [
+    {
+      "nome": "Cliente de Teste",
+      "email": "teste@example.com",
+      "perfil": "Conservador",
+      "saldo": "R$ 1.500,00"
+    }
+  ]
+}
 ```
 
-## Tecnologias e Ferramentas
+Os valores de `perfil` devem corresponder aos perfis existentes no CSV. O exemplo é ilustrativo; confirma os nomes reais das colunas e os valores aceites no ficheiro de dados do desafio.
 
-O projeto utiliza ferramentas gratuitas e acessíveis, organizadas conforme cada etapa do fluxo:
+## Verificações importantes
 
-| Etapa | Ferramenta | Função |
-|-------|-----------|--------|
-| Hospedagem | GitHub Pages | Servir a página de clientes e o CSV de investimentos |
-| Extração (RPA) | Python + BeautifulSoup | Coletar dados dos clientes via web scraping |
-| Orquestração | N8N | Processar dados, cruzar perfis e gerar mensagens |
-| Geração com IA | Agente de IA no N8N | Criar mensagens personalizadas com LLM (desafio extra) |
+- O CSV tem de ser devolvido como texto pelo nó HTTP Request.
+- Confirma se os perfis dos clientes correspondem aos perfis do CSV.
+- Testa endereços válidos e inválidos.
+- Verifica as execuções no n8n antes de considerar o projeto concluído.
+- A resposta do Webhook é genérica; não deve ser interpretada como prova de que todos os e-mails foram enviados com sucesso. Se o pedido contiver vários clientes e houver resultados nos dois ramos do nó If, testa cuidadosamente o comportamento da resposta HTTP, pois o Webhook só pode devolver uma resposta por pedido.
+- As recomendações são uma demonstração técnica e não constituem aconselhamento financeiro.
 
-Além dessas, você pode usar IAs generativas como **Gemini**, **Claude** ou **ChatGPT** como copilotos para auxiliar na escrita de código e tirar dúvidas ao longo do desenvolvimento.
+## Segurança
 
-## Roteiro do Desafio
+O JSON partilhável foi preparado sem as referências de credenciais da instância original. Depois da importação, configura as credenciais no n8n. Nunca publiques tokens, palavras-passe, dados pessoais reais ou URLs privadas de Webhook.
 
-### Etapa 1: Entenda o Projeto
+## Tecnologias
 
-Antes de começar, explore o repositório base que já contém a estrutura inicial:
+- n8n
+- JavaScript
+- HTTP Request e Webhook
+- Modelo de IA
+- Gmail
 
-1. **Página de Clientes (`docs/index.html`):** Uma página HTML hospedada no GitHub Pages com uma lista de clientes fictícios contendo nome, email, saldo e perfil de investidor (Conservador, Moderado ou Arrojado). Disponível online [neste link](https://digitalinnovationone.github.io/dio-lab-assistente-investimentos-rpa-n8n).
-2. **Dados de Investimentos (`docs/data.csv`):** Um arquivo CSV também hospedado no GitHub Pages com opções de investimento organizadas por perfil. Disponível online [neste link](https://digitalinnovationone.github.io/dio-lab-assistente-investimentos-rpa-n8n/data.csv).
-3. **Script de RPA (`src/extrair_clientes.ipynb`):** Um notebook Python que acessa a página de clientes e extrai os dados da tabela usando BeautifulSoup.
+## Autoria
 
-> 🤖 **Por que o script é considerado RPA?** Ele faz exatamente o que um humano faria manualmente: abre uma página, lê os dados de uma tabela e os envia para outro sistema. A diferença é que o "robô" (código) executa isso automaticamente. Essa abordagem é útil quando não existe uma API disponível ou quando precisamos integrar sistemas legados.
-
-### Etapa 2: Configure o Ambiente
-
-1. Faça um **fork** do repositório base para sua conta do GitHub
-2. Crie uma conta no [N8N Cloud](https://n8n.io/) ou instale localmente
-3. Abra o notebook `src/extrair_clientes.ipynb` no [Google Colab](https://colab.research.google.com/) e execute para entender o fluxo de extração
-
-> 💡 **Atenção:** O script já extrai os dados, mas o envio ao N8N está comentado (`TODO`). Você vai configurar a URL do Webhook após criá-lo na próxima etapa.
-
-### Etapa 3: Desenvolva o Workflow no N8N
-
-Este é o coração do desafio! Monte um fluxo que:
-
-1. Receba os dados dos clientes via Webhook (copie a URL gerada e configure no script Python)
-2. Leia o arquivo `docs/data.csv` com as opções de investimento
-3. Cruze o perfil de cada cliente com a opção adequada
-4. Gere uma mensagem de recomendação para cada cliente
-
-### Etapa 4 (MVP): Mensagens Estáticas
-
-Para a versão mínima, use templates de mensagem fixos baseados no perfil:
-
-- **Conservador:** Foco em renda fixa e segurança
-- **Moderado:** Mix equilibrado entre renda fixa e variável
-- **Arrojado:** Ênfase em ações e maior potencial de retorno
-
-### Etapa 5 (Desafio): Integração com IA Generativa
-
-Conecte o Agente de IA do N8N a um modelo como Gemini ou GPT para:
-
-- Analisar o contexto do cliente (saldo, perfil)
-- Gerar mensagens únicas e personalizadas
-- Criar recomendações mais inteligentes e humanizadas
-
-## Entregáveis
-
-### MVP (Mínimo Viável)
-
-- [ ] Repositório forkado com o workflow N8N implementado
-- [ ] Workflow N8N exportado (`n8n/workflow.json`) com mensagens estáticas
-- [ ] Script de RPA integrado ao Webhook do N8N
-- [ ] Print ou vídeo demonstrando o fluxo funcionando de ponta a ponta
-
-### Desafio Completo
-
-- [ ] Todos os itens do MVP
-- [ ] Integração com Agente de IA no N8N
-- [ ] Mensagens geradas dinamicamente via LLM
-- [ ] Documentação explicando as decisões técnicas
-
-## Estrutura do Repositório
-
-```
-📁 dio-lab-assistente-investimentos-rpa-n8n/
-├── 📄 README.md
-├── 📁 src/
-│   └── 📄 extrair_clientes.ipynb   # ✅ Notebook Python (já implementado, falta só o TODO)
-├── 📁 n8n/
-│   └── 📄 workflow.json            # 🎯 Seu desafio: exportar o workflow aqui
-└── 📁 docs/
-    ├── 📄 index.html               # ✅ Página de clientes (já implementado)
-    └── 📄 data.csv                 # ✅ Opções de investimento (já implementado)
-```
-
-## Prompts Úteis para Copilotos de IA
-
-| Tarefa | Sugestão de Prompt |
-|--------|-------------------|
-| Gerar dados fictícios | "Crie 10 clientes fictícios com nome, email, saldo e perfil de investidor em JSON" |
-| Entender código | "Explique o que faz a biblioteca BeautifulSoup em Python" |
-| Debugar erros | "Meu script Python está dando erro X, o que pode ser?" |
-| Montar workflow | "Como configuro um webhook no N8N para receber dados JSON?" |
-
-## Referências
-
-- [Documentação do N8N](https://docs.n8n.io/)
-- [BeautifulSoup: Web Scraping com Python](https://realpython.com/beautiful-soup-web-scraper-python/)
-- [GitHub Pages: Guia Rápido](https://pages.github.com/)
-
----
-
-**Bons estudos e mãos à obra** 🚀
-
-Se tiver dúvidas, lembre-se: a melhor forma de aprender é experimentando. Erre, corrija e celebre cada pequena vitória no caminho.
+Projeto educativo desenvolvido por Alda Benta no âmbito de desafios da DIO.
