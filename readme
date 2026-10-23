@@ -1,0 +1,67 @@
+# Assistente de Investimentos com n8n
+
+## 📌 Sobre o projeto
+
+Este projeto foi desenvolvido no âmbito de um desafio da DIO e tem como objetivo explorar a automação de processos (RPA) através do n8n, integrando diferentes serviços e funcionalidades de inteligência artificial para criar um assistente de investimentos.
+
+## 🎯 Objetivos
+
+- Criar um workflow de automação no n8n.
+- Integrar pedidos HTTP e processamento de dados com JavaScript.
+- Utilizar um modelo de inteligência artificial para gerar respostas.
+- Aplicar condições para controlar o fluxo de execução.
+- Explorar o envio de mensagens através do Gmail.
+- Utilizar um Webhook como ponto de entrada do workflow.
+
+## 🛠️ Tecnologias utilizadas
+
+- **n8n:** criação e execução de workflows de automação.
+- **JavaScript:** transformação e processamento de dados.
+- **HTTP Request:** comunicação com serviços externos e APIs.
+- **Inteligência Artificial:** processamento de informação e geração de respostas.
+- **Gmail:** envio de mensagens automatizadas.
+- **Webhook:** receção de pedidos para iniciar o fluxo.
+
+## ⚙️ Funcionamento
+
+O workflow foi construído com os seguintes componentes:
+
+1. **Webhook:** recebe o pedido inicial.
+2. **HTTP Request:** consulta um serviço externo.
+3. **Code in JavaScript:** processa e prepara os dados.
+4. **Merge:** combina dados provenientes de diferentes etapas.
+5. **Message a model:** utiliza inteligência artificial para gerar uma resposta.
+6. **Code in JavaScript:** prepara e transforma os resultados.
+7. **If:** verifica uma condição para determinar o caminho da execução.
+8. **Gmail:** envia uma mensagem quando as condições definidas são cumpridas.
+9. **Respond to Webhook:** devolve uma resposta ao pedido inicial.
+
+## 🚀 Como importar o projeto
+
+1. Descarrega o ficheiro JSON disponível neste repositório.
+2. Abre a tua instância do n8n.
+3. Cria ou abre um workflow.
+4. No menu do workflow, seleciona a opção de importar a partir de um ficheiro, quando disponível.
+5. Seleciona o ficheiro JSON.
+6. Configura as credenciais e os parâmetros necessários.
+7. Testa o workflow antes de o utilizar.
+
+## 🔐 Configuração e segurança
+
+As credenciais dos serviços externos devem ser configuradas diretamente no n8n.
+
+Não publiques palavras-passe, tokens de API, chaves privadas, dados pessoais ou outras informações confidenciais no repositório.
+
+A importação do workflow não garante que todas as integrações funcionem automaticamente: poderá ser necessário configurar credenciais, URLs, parâmetros e serviços externos.
+
+## 📚 Aprendizagens
+
+Este projeto permitiu explorar a construção de workflows, a integração entre serviços, o tratamento de dados com JavaScript, a utilização de inteligência artificial e a criação de processos automatizados.
+
+## 👩‍💻 Autora
+
+Projeto desenvolvido por **Alda Benta**, no âmbito dos desafios de aprendizagem da DIO.
+
+## 📄 Licença
+
+Projeto desenvolvido para fins educativos. A utilização e redistribuição do código devem respeitar as licenças dos componentes e serviços utilizados.
